@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Google Auth Sample (Next.js + Tailwind CSS)
 
-## Getting Started
+Next.js (App Router), NextAuth.js (v5), Tailwind CSS を使用した Google 認証のサンプルアプリケーションです。
 
-First, run the development server:
+## 機能
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+*   **Google アカウントでのログイン**: NextAuth.js を使用。
+*   **セッション管理**: ログイン状態の永続化と、サーバー/クライアントサイドでの状態取得。
+*   **モダンな UI**: Tailwind CSS を使用したレスポンシブでクリーンなデザイン。
+*   **ユーザー情報表示**: ログインユーザーのアイコンと名前を表示。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 使用技術
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+*   [Next.js](https://nextjs.org/) 15+ (App Router)
+*   [NextAuth.js](https://authjs.dev/) v5 (Beta)
+*   [Tailwind CSS](https://tailwindcss.com/)
+*   TypeScript
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## セットアップ手順
 
-## Learn More
+1.  **リポジトリのクローン**
+    ```bash
+    git clone <repository-url>
+    cd google-auth-sample
+    npm install
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+2.  **環境変数の設定**
+    `.env.local` ファイルをルートディレクトリに作成し、以下の値を設定してください。
+    
+    ```env
+    AUTH_SECRET="your-generated-secret" # npx auth secret で生成可能
+    AUTH_GOOGLE_ID="your-google-client-id"
+    AUTH_GOOGLE_SECRET="your-google-client-secret"
+    ```
+    
+    *   Google Cloud Console で OAuth 2.0 クライアントを作成し、リダイレクト URI に `http://localhost:3000/api/auth/callback/google` を設定してください。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3.  **開発サーバーの起動**
+    ```bash
+    npm run dev
+    ```
+    http://localhost:3000 にアクセスします。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ディレクトリ構成
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*   `app/`: アプリケーションのコード
+    *   `api/auth/`: NextAuth 用の API ルート
+*   `components/`: UI コンポーネント (SignIn/SignOut ボタンなど)
+*   `auth.ts`: NextAuth の設定ファイル
+*   `doc/`: 開発ドキュメント (セットアップ手順、アーキテクチャ図など)
