@@ -1,72 +1,81 @@
 import { auth } from "@/auth"
-import { SignIn, SignOut } from "@/components/auth-components"
-import Image from "next/image"
+import { AuthForm } from "@/frontend/components/AuthForm"
 
 export default async function Home() {
   const session = await auth()
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
-          Google Auth Sample
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Built with Next.js, NextAuth.js & Tailwind CSS
-        </p>
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] py-12">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
+            <span className="text-white font-bold text-3xl">P</span>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Portalへようこそ</h2>
+          <p className="text-gray-500 mt-2">サービスポータルをご利用いただくにはログインが必要です</p>
+        </div>
+
+        <AuthForm />
       </div>
+    )
+  }
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl ring-1 ring-gray-900/5 sm:rounded-2xl sm:px-10">
-          <div className="flex flex-col items-center space-y-6">
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <header>
+        <h1 className="text-3xl font-bold text-gray-900">ホーム</h1>
+        <p className="text-gray-500">サービスポータルの最新情報</p>
+      </header>
 
-            {session?.user ? (
-              // Logged In Design
-              <div className="w-full flex flex-col items-center animate-in fade-in duration-500">
-                <div className="relative h-24 w-24 mb-4">
-                  {session.user.image ? (
-                    <Image
-                      src={session.user.image}
-                      alt="User Profile"
-                      fill
-                      className="rounded-full object-cover ring-4 ring-blue-50"
-                    />
-                  ) : (
-                    <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-2xl text-gray-500">?</span>
-                    </div>
-                  )}
-                </div>
+      <section className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-800">
+          <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+            />
+          </svg>
+          重要なお知らせ
+        </h2>
 
-                <h3 className="text-xl font-medium text-gray-900">
-                  Welcome back!
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  {session.user.name}
-                </p>
+        <div className="space-y-6">
+          <div className="border-l-4 border-blue-500 pl-4 py-1">
+            <p className="text-xs text-gray-400 font-medium uppercase mb-1">2026.01.03</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">新ポータルサイトを公開しました</h3>
+            <p className="text-gray-600 leading-relaxed">
+              Google認証、権限申請、承認機能を集約した新しい社内ポータルサイトを公開しました。
+              左側のメニューから各機能へアクセスいただけます。
+            </p>
+          </div>
 
-                <div className="w-full border-t border-gray-100 pt-6 flex justify-center">
-                  <SignOut />
-                </div>
-              </div>
-            ) : (
-              // Logged Out Design
-              <div className="w-full flex flex-col items-center animate-in fade-in duration-500">
-                <div className="rounded-full bg-blue-50 p-3 mb-4">
-                  <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 mb-8 text-center">
-                  Please sign in to access your profile and managing your settings.
-                </p>
-                <SignIn />
-              </div>
-            )}
-
+          <div className="border-l-4 border-gray-200 pl-4 py-1">
+            <p className="text-xs text-gray-400 font-medium uppercase mb-1">2026.01.02</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">システムメンテナンスのお知らせ</h3>
+            <p className="text-gray-600 leading-relaxed">
+              来週末、データベースエンジンのアップデートに伴うメンテナンスを実施します。
+              詳細は後日改めてご案内いたします。
+            </p>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-200">
+          <h3 className="font-bold text-lg mb-2">権限申請</h3>
+          <p className="text-blue-100 text-sm mb-6">新しいサービスへのアクセスが必要な場合はこちらから申請してください。</p>
+          <a href="/requests" className="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-50 transition">
+            申請フォームへ
+          </a>
+        </div>
+
+        <div className="bg-gray-900 rounded-2xl p-6 text-white">
+          <h3 className="font-bold text-lg mb-2">保有権限</h3>
+          <p className="text-gray-400 text-sm mb-6">現在あなたが利用可能なサービスはサイドメニューからご確認いただけます。</p>
+          <div className="text-xs font-mono bg-gray-800 p-2 rounded">Total Roles: {session.user.permissions.length}</div>
+        </div>
+      </section>
     </div>
   )
 }
