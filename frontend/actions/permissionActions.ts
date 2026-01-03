@@ -3,14 +3,16 @@
 import { auth } from "@/auth";
 import {
   approveRegistration,
+  createRegistrationRequest,
+  rejectRegistration,
+} from "@/serverside/services/auth/registrationService";
+import {
   approveRequest,
   createPermissionRequest,
-  createRegistrationRequest,
   deleteUser,
   getUserPendingRequests,
-  rejectRegistration,
   rejectRequest,
-} from "@/serverside/services/permissionService";
+} from "@/serverside/services/permission/requestService";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -81,7 +83,11 @@ export async function handleRejectRegistration(requestId: string) {
 /**
  * サービス権限申請の送信
  */
-export async function submitRequest(serviceId: string, roleId: string) {
+export async function submitRequest(
+  serviceId: string,
+  roleId: string,
+  departmentId?: string
+) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -95,7 +101,7 @@ export async function submitRequest(serviceId: string, roleId: string) {
       throw new Error("This service is already pending approval.");
     }
 
-    await createPermissionRequest(session.user.id, serviceId, roleId);
+    await createPermissionRequest(session.user.id, serviceId, roleId, departmentId);
     revalidatePath("/");
     return { success: true };
   } catch (error: any) {

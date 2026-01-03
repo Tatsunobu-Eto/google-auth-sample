@@ -1,6 +1,8 @@
 import { auth } from "@/auth"
 import { RequestForm } from "@/frontend/components/RequestForm"
-import { getAllServices, getAllRoles, getUserPendingRequests } from "@/serverside/services/permissionService"
+import { getDepartmentTree } from "@/serverside/services/organization/departmentService"
+import { getUserPendingRequests } from "@/serverside/services/permission/requestService"
+import { getAllRoles, getAllServices } from "@/serverside/services/organization/departmentService"
 import { redirect } from "next/navigation"
 
 export default async function RequestsPage() {
@@ -9,6 +11,7 @@ export default async function RequestsPage() {
 
   const services = await getAllServices()
   const roles = await getAllRoles()
+  const departments = await getDepartmentTree()
   const userPendingRequests = await getUserPendingRequests(session.user.id)
   const pendingServiceIds = userPendingRequests.map(r => r.serviceId)
 
@@ -43,8 +46,8 @@ export default async function RequestsPage() {
                 {userPendingRequests.map(req => (
                   <div key={req.id} className="bg-white px-4 py-3 rounded-lg border border-orange-100 flex justify-between items-center shadow-sm">
                     <div>
-                      <p className="font-bold text-gray-900">{req.service.name}</p>
-                      <p className="text-xs text-gray-500">希望権限: {req.role.name}</p>
+                      <p className="font-bold text-gray-900">{(req as any).service?.name}</p>
+                      <p className="text-xs text-gray-500">希望権限: {(req as any).role?.name}</p>
                     </div>
                     <span className="text-[10px] font-bold px-2 py-1 bg-orange-100 text-orange-700 rounded uppercase">
                       Pending
@@ -56,10 +59,11 @@ export default async function RequestsPage() {
           )}
         </div>
 
-        <div className="lg:w-[400px]">
+        <div className="flex-1">
           <RequestForm 
             services={services} 
             roles={roles} 
+            departments={departments}
             pendingServiceIds={pendingServiceIds}
           />
         </div>

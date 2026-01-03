@@ -1,36 +1,87 @@
-import { prisma } from "@/serverside/db/prisma";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 async function main() {
-  // Roles
-  const roles = [
-    { name: "一般" },
-    { name: "管理者" },
-    { name: "システム管理者" },
-  ];
+  console.log("Seeding departments (massive scale)...");
 
-  for (const role of roles) {
-    await prisma.role.upsert({
-      where: { name: role.name },
-      update: {},
-      create: role,
+  // 既存のデータをクリーンアップ（依存関係順）
+  await prisma.permissionRequest.deleteMany();
+  await prisma.userPermission.deleteMany();
+  await prisma.department.deleteMany();
+
+  const businessUnits = [
+    "営業本部", "技術本部", "管理本部", "製造本部", "海外事業本部", 
+    "R&D本部", "マーケティング本部", "カスタマーサクセス本部", "DX推進本部", "法務・コンプライアンス本部"
+  ];
+  
+  let totalCount = 0;
+
+  for (const buName of businessUnits) {
+    const bu = await prisma.department.create({
+      data: { name: buName },
     });
+    totalCount++;
+
+    // 各本部に5つの部を作成
+    for (let i = 1; i <= 5; i++) {
+      const deptName = `${buName} 第${i}部`;
+      const dept = await prisma.department.create({
+        data: { 
+          name: deptName,
+          parentId: bu.id 
+        },
+      });
+      totalCount++;
+
+      // 各部にさらに10の課を作成
+      for (let j = 1; j <= 10; j++) {
+        const sectionName = `${deptName} 第${j}課`;
+        const section = await prisma.department.create({
+          data: {
+            name: sectionName,
+            parentId: dept.id
+          }
+        });
+        totalCount++;
+
+        // 各課にさらに2つのチームを作成
+        // 10本部 * 5部 * 10課 * 2チーム = 1000チーム
+        // + 10本部 + 50部 + 500課 = 合計1560部署
+        for (let k = 1; k <= 2; k++) {
+          const teamName = `${sectionName} チーム${String.fromCharCode(64 + k)}`;
+          await prisma.department.create({
+            data: {
+              name: teamName,
+              parentId: section.id
+            }
+          });
+          totalCount++;
+        }
+      }
+    }
   }
 
-  // Services
-  const services = [
-    { name: "在庫管理", description: "商品の在庫状況を管理するサービスです。" },
-    { name: "社員人事情報", description: "社員の基本情報や配属先を管理するサービスです。" },
-  ];
+  console.log(`Departments seeded successfully. Total: ${totalCount} departments.`);
 
-  for (const service of services) {
+  // サービスとロールの初期データ
+  const services = ["在庫管理システム", "人事評価システム", "経費精算システム", "顧客管理CRM", "社内Wiki", "勤怠管理システム"];
+  for (const name of services) {
     await prisma.service.upsert({
-      where: { name: service.name },
+      where: { name },
       update: {},
-      create: service,
+      create: { name, description: `${name}の利用権限` },
     });
   }
 
-  console.log("Seed data created successfully.");
+  const roles = ["一般", "管理者", "システム管理者"];
+  for (const name of roles) {
+    await prisma.role.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
 }
 
 main()
