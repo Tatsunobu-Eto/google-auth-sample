@@ -20,12 +20,11 @@ export function AuthForm() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/",
       })
       if (result?.error) {
         setError("ログインに失敗しました。メールアドレスまたはパスワードが正しくないか、まだ承認されていない可能性があります。")
       } else {
-        window.location.href = "/"
+        window.location.href = window.location.origin
       }
     } catch (err) {
       setError("エラーが発生しました。")
@@ -55,7 +54,7 @@ export function AuthForm() {
 
         {/* Google Auth */}
         <button
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl: window.location.origin })}
           className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 font-bold py-2.5 rounded-lg hover:bg-gray-50 transition mb-6"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
