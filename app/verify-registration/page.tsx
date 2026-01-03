@@ -1,16 +1,14 @@
 "use client"
 
-import { useEffect, useState, useTransition } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { verifyRegistrationToken } from "@/serverside/services/auth/registrationService"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
+import { handleVerifyToken } from "@/frontend/actions/permissionActions"
 import Link from "next/link"
 
 export default function VerifyRegistrationPage() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying")
   const [message, setMessage] = useState("登録トークンを検証しています...")
-  const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
     const token = searchParams.get("token")
@@ -22,14 +20,13 @@ export default function VerifyRegistrationPage() {
 
     const verify = async () => {
       try {
-        // verifyRegistrationToken は "use server" ではないが、
-        // クライアント側から呼べるのは Server Actions のみ。
-        // ここでエラーが起きる可能性があるため、本来は Action を経由すべき。
-        // 一旦現状の構成（Client Component 内での呼び出し）を維持しつつパスのみ修正。
-        // ※実際には permissionActions.ts に Action を作るのが正解。
-        await verifyRegistrationToken(token)
-        setStatus("success")
-        setMessage("アカウントの本登録が完了しました！")
+        const result = await handleVerifyToken(token)
+        if (result.success) {
+          setStatus("success")
+          setMessage("アカウントの本登録が完了しました！")
+        } else {
+          throw new Error(result.error)
+        }
       } catch (error: any) {
         setStatus("error")
         setMessage(error.message || "トークンの検証に失敗しました。期限切れの可能性があります。")

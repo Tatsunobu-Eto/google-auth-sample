@@ -5,6 +5,7 @@ import {
   approveRegistration,
   createRegistrationRequest,
   rejectRegistration,
+  verifyRegistrationToken,
 } from "@/serverside/services/auth/registrationService";
 import {
   approveRequest,
@@ -151,6 +152,19 @@ export async function handleDeleteUser(userId: string) {
     return { success: true };
   } catch (error: any) {
     console.error("handleDeleteUser error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * 本登録トークンの検証
+ */
+export async function handleVerifyToken(token: string) {
+  try {
+    await verifyRegistrationToken(token);
+    return { success: true };
+  } catch (error: any) {
+    console.error("handleVerifyToken error:", error.message);
     return { success: false, error: error.message };
   }
 }
